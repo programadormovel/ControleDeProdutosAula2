@@ -1,32 +1,33 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
 
 namespace ControleDeProdutosAula.Models
 {
+	[Index(nameof(CodigoDeBarras), IsUnique = true)]	
 	public class ProdutoModel
-
 	{
 		public Int64 Id { get; set; }
 
 		[Required(ErrorMessage = "Campo Obrigatório")]
 		public string Descricao { get; set; } = string.Empty;
 
-		[StringLength(12, MinimumLength = 12, ErrorMessage = "Mínimo de 12 caracteres!")]
+        [StringLength(12, MinimumLength = 12,
+			ErrorMessage = "Mínimo de 12 caracteres!")]
 		[Required(ErrorMessage = "Campo Obrigatório")]
 		public string CodigoDeBarras { get; set; } = string.Empty;
 
 		[Range(typeof(DateTime), minimum: "23/08/2023", maximum: "24/8/2024")]
 		[DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}", ApplyFormatInEditMode = true)]
 		[DataType(DataType.Date)]
-		public DateTime DataDeValidade { get; set; }
+		public DateTime? DataDeValidade { get; set; }
 
 		[DataType(DataType.DateTime)]
 		public DateTime DataDeRegistro { get; set; }
 
 		[Range(1, 1000)]
-		[Required(ErrorMessage = "Campo Obrigatório")]
-		public int Quantidade { get; set; }
+		public Int64 Quantidade { get; set; }
 
 		[DataType(DataType.Currency)]
 		[Column(TypeName = "decimal(18, 2)")]
@@ -36,7 +37,7 @@ namespace ControleDeProdutosAula.Models
 		public string NomeDaFoto { get; set; }
 
 		[MaybeNull]
-		public byte[] Foto { get; set; }
+		public byte[]? Foto { get; set; }
 
 		[Required(ErrorMessage = "Campo Obrigatório")]
 		public bool Ativo { get; set; }
