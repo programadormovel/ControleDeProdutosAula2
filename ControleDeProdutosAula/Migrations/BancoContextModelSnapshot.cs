@@ -61,12 +61,52 @@ namespace ControleDeProdutosAula.Migrations
 
                     b.Property<string>("Telefone")
                         .IsRequired()
-                        .HasMaxLength(9)
-                        .HasColumnType("nvarchar(9)");
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
 
                     b.HasKey("Id");
 
                     b.ToTable("Cliente");
+                });
+
+            modelBuilder.Entity("ControleDeProdutosAula.Models.LoginModel", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<int>("Ativo")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("DataDeRegistro")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool?>("EmailConfirmado")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("NivelAcesso")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Senha")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool?>("TelefoneConfirmado")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Usuario")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Login");
                 });
 
             modelBuilder.Entity("ControleDeProdutosAula.Models.ProdutoModel", b =>
@@ -101,13 +141,16 @@ namespace ControleDeProdutosAula.Migrations
                     b.Property<string>("NomeDaFoto")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Quantidade")
-                        .HasColumnType("int");
+                    b.Property<long>("Quantidade")
+                        .HasColumnType("bigint");
 
                     b.Property<decimal>("Valor")
                         .HasColumnType("decimal(18, 2)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CodigoDeBarras")
+                        .IsUnique();
 
                     b.ToTable("Produto");
                 });

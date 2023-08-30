@@ -21,7 +21,7 @@ namespace ControleDeProdutosAula.Models
 		[Range(typeof(DateTime), minimum: "23/08/2023", maximum: "24/8/2024")]
 		[DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}", ApplyFormatInEditMode = true)]
 		[DataType(DataType.Date)]
-		public DateTime? DataDeValidade { get; set; }
+		public DateTime DataDeValidade { get; set; }
 
 		[DataType(DataType.DateTime)]
 		public DateTime DataDeRegistro { get; set; }
