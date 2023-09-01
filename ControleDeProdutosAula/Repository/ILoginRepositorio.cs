@@ -12,5 +12,6 @@ namespace ControleDeProdutosAula.Repository
 		Task<LoginModel> ListarPorEmailSenha(string email, string senha);
 		Task<LoginModel> Atualizar(LoginModel login);
 		Task<bool> Apagar(long id);
+
 	}
 }

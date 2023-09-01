@@ -26,7 +26,12 @@ namespace ControleDeProdutosAula.Repository
 			return await _bancoContext.Produto.ToListAsync();
 		}
 
-		public async Task<ProdutoModel> ListarPorId(long id)
+        public async Task<List<ProdutoModel>> Produtos()
+        {
+            return await _bancoContext.Produto.ToListAsync();
+        }
+
+        public async Task<ProdutoModel> ListarPorId(long id)
 		{
 			Task<ProdutoModel> produtoDB;
 

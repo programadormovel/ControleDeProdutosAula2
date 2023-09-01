@@ -5,6 +5,7 @@ namespace ControleDeProdutosAula.Repository
     public interface IProdutoRepositorio
     {
         Task<List<ProdutoModel>> BuscarTodos();
+        Task<List<ProdutoModel>> Produtos();
         Task<ProdutoModel> Adicionar(ProdutoModel produto);
         Task<ProdutoModel> ListarPorId(long id);
         Task<ProdutoModel> Atualizar(ProdutoModel produto);

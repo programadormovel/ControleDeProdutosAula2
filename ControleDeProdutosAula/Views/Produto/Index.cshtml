@@ -4,8 +4,11 @@
 	ViewData["Title"] = "Produtos";
 }
 
-<div class="text-center">
 
+<div class="text-center">
+	<div>
+		<p>Usuário: @{Context.Session.GetString(IndexModel.SessionKeyUser);}</p>
+	</div>
 	<div class="d-grid gap-2 d-md-flex justify-content-md-start">
 		<a class="btn btn-success" role="button" asp-controller="Produto" asp-action="Criar">Adicionar novo produto</a>
 	</div>

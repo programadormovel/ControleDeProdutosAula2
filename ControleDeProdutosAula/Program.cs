@@ -4,6 +4,17 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Habilita o MemoryCache
+builder.Services.AddDistributedMemoryCache();
+// Define configurações padrões de sessão
+builder.Services.AddSession(options =>
+{
+    options.Cookie.Name = ".ControleDeProdutosAula.Session";
+    options.IdleTimeout = TimeSpan.FromSeconds(5);
+    //options.Cookie.HttpOnly = true; 
+    options.Cookie.IsEssential = true;  
+});
+
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<BancoContext>(
@@ -32,6 +43,8 @@ app.UseStaticFiles();
 app.UseRouting();
 
 app.UseAuthorization();
+
+app.UseSession();   
 
 app.MapControllerRoute(
     name: "default",

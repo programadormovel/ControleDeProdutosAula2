@@ -1,21 +1,41 @@
-﻿
-@{
+﻿@{
 
 }
 
-<div class="text-right">
-    <form method="post" >
-        <div>
-            <label>E-mail:</label>
-            <input type="text" id="email" name="email">
-        </div>
-        <div>
-            <label>Senha:</label>
-            <input type="password" id="senha" name="senha">
-        </div>
-        <div>
-            <input type="submit" id="botao" value="logar">
-            <a asp-area="" asp-controller="Login" asp-action="Registro">Regitrar-se</a>
-        </div>
-    </form>
+<div class="col-sm-5 center mx-auto">
+	<div class="text-center" style="padding:50px 0">
+		<div class="login-form-1">
+			<form id="login-form" class="text-left" method="post">
+				<div class="login-form-main-message"></div>
+				<div class="main-login-form">
+					<div class="login-group">
+						<div class="form-group">
+							<label for="email" class="sr-only">E-mail</label>
+							<input type="text" class="form-control" id="email" name="email" placeholder="E-mail">
+						</div>
+						<div class="form-group mt-3">
+							<label for="senha" class="sr-only">Senha</label>
+							<input type="password" class="form-control" id="senha" name="senha" placeholder="Senha">
+						</div>
+						<div class="form-group login-group-checkbox mt-1">
+							<input type="checkbox" id="lg_remember" name="lg_remember">
+							<label for="lg_remember">remember</label>
+						</div>
+					</div>
+					<input class="my-3" type="submit" id="botao" value="Entrar" 
+					   />
+				</div>
+				<div class="etc-login-form">
+					<p>
+						Esqueceu sua senha?
+						<a href="#">Clique aqui</a>
+					</p>
+					<p>
+						Novo usuário?
+						<a class="" asp-area="" asp-controller="Login" asp-action="Registro">Registrar-se</a>
+					</p>
+				</div>
+			</form>
+		</div>
+	</div>
 </div>

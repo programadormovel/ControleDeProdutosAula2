@@ -1,8 +1,10 @@
 ﻿using ControleDeProdutosAula.Models;
 using ControleDeProdutosAula.Repository;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 using System.ComponentModel.DataAnnotations;
 using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
+using Microsoft.IdentityModel.Tokens;
 
 namespace ControleDeProdutosAula.Controllers
 {
@@ -10,6 +12,11 @@ namespace ControleDeProdutosAula.Controllers
     {
         private readonly IProdutoRepositorio _produtoRepositorio;
         private IHostingEnvironment Environment;
+        public const string SessionKeyUser = "_Usuario";
+        public const string SessionKeyEmail = "_Email";
+        public const string SessionKeyNivel = "_Nivel";
+
+        private readonly ILogger<IndexModel> _logger;
 
         public ProdutoController(IProdutoRepositorio produtoRepositorio, IHostingEnvironment _environment)
         {
@@ -17,11 +24,27 @@ namespace ControleDeProdutosAula.Controllers
             Environment = _environment;
         }
 
+
         public async Task<IActionResult> Index()
         {
             List<ProdutoModel> produtos = await _produtoRepositorio.BuscarTodos();
 
-            return await Task.FromResult(View(produtos));
+            var usuario = HttpContext.Session.GetString(SessionKeyUser);
+            if (!usuario.IsNullOrEmpty())
+            {
+                return await Task.FromResult(View(produtos));
+            }
+            return await Task.FromResult(RedirectToAction("Index", "Home"));
+
+        }
+
+        [Route("api/Produtos")]
+        [HttpGet]
+        public async Task<ActionResult<List<ProdutoModel>>> Produtos()
+        {
+            List<ProdutoModel> produtos = await _produtoRepositorio.BuscarTodos();
+
+            return await Task.FromResult(produtos);
         }
 
         public async Task<IActionResult> Criar()
@@ -89,9 +112,9 @@ namespace ControleDeProdutosAula.Controllers
                 model.NomeDaFoto = caminhoCompleto;
             }
 
-			model.Foto = Util.ReadFully2(caminhoCompleto);
+            model.Foto = Util.ReadFully2(caminhoCompleto);
 
-			await _produtoRepositorio.Adicionar(model);
+            await _produtoRepositorio.Adicionar(model);
 
             return await Task.FromResult(RedirectToAction("Index"));
         }

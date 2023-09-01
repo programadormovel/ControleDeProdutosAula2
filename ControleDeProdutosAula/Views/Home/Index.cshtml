@@ -1,6 +1,25 @@
 ﻿@{
     ViewData["Title"] = "Home Page";
+    var usuario = Context.Session.GetString("_Usuario");
 }
+
+<div>
+    @if (@usuario != null)
+    {
+        <p>
+            <b>Bem-vindo:</b>
+            @usuario
+        </p>
+    }
+    else
+    {
+        <div></div>
+    }
+
+
+
+</div>
+
 
 <div class="text-center">
     <h1 class="display-4">Sistema de Controle de Produtos</h1>
