@@ -41,5 +41,10 @@ namespace ControleDeProdutosAula.Models
 
 		[Required(ErrorMessage = "Campo Obrigatório")]
 		public bool Ativo { get; set; }
-	}
+
+        public static implicit operator List<object>(ProdutoModel v)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }

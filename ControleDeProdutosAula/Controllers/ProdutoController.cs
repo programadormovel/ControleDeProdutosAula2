@@ -8,122 +8,113 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace ControleDeProdutosAula.Controllers
 {
-    public class ProdutoController : Controller
-    {
-        private readonly IProdutoRepositorio _produtoRepositorio;
-        private IHostingEnvironment Environment;
-        public const string SessionKeyUser = "_Usuario";
-        public const string SessionKeyEmail = "_Email";
-        public const string SessionKeyNivel = "_Nivel";
+	public class ProdutoController : Controller
+	{
+		private readonly IProdutoRepositorio _produtoRepositorio;
+		private IHostingEnvironment Environment;
+		public const string SessionKeyUser = "_Usuario";
+		public const string SessionKeyEmail = "_Email";
+		public const string SessionKeyNivel = "_Nivel";
 
-        private readonly ILogger<IndexModel> _logger;
+		private readonly ILogger<IndexModel> _logger;
 
-        public ProdutoController(IProdutoRepositorio produtoRepositorio, IHostingEnvironment _environment)
-        {
-            _produtoRepositorio = produtoRepositorio;
-            Environment = _environment;
-        }
+		public ProdutoController(IProdutoRepositorio produtoRepositorio, IHostingEnvironment _environment)
+		{
+			_produtoRepositorio = produtoRepositorio;
+			Environment = _environment;
+		}
 
 
-        public async Task<IActionResult> Index()
-        {
-            List<ProdutoModel> produtos = await _produtoRepositorio.BuscarTodos();
+		public async Task<IActionResult> Index()
+		{
+			List<ProdutoModel> produtos = await _produtoRepositorio.BuscarTodos();
 
-            var usuario = HttpContext.Session.GetString(SessionKeyUser);
-            if (!usuario.IsNullOrEmpty())
-            {
-                return await Task.FromResult(View(produtos));
-            }
-            return await Task.FromResult(RedirectToAction("Index", "Home"));
+			var usuario = HttpContext.Session.GetString(SessionKeyUser);
+			if (!usuario.IsNullOrEmpty())
+			{
+				return await Task.FromResult(View(produtos));
+			}
+			return await Task.FromResult(RedirectToAction("Index", "Home"));
 
-        }
+		}
 
-        [Route("api/Produtos")]
-        [HttpGet]
-        public async Task<ActionResult<List<ProdutoModel>>> Produtos()
-        {
-            List<ProdutoModel> produtos = await _produtoRepositorio.BuscarTodos();
+		public async Task<IActionResult> Criar()
+		{
+			return await Task.FromResult(View());
+		}
 
-            return await Task.FromResult(produtos);
-        }
+		public async Task<IActionResult> Editar(long id)
+		{
+			ProdutoModel produto = await _produtoRepositorio.ListarPorId(id);
 
-        public async Task<IActionResult> Criar()
-        {
-            return await Task.FromResult(View());
-        }
+			return await Task.FromResult(View(produto));
+		}
 
-        public async Task<IActionResult> Editar(long id)
-        {
-            ProdutoModel produto = await _produtoRepositorio.ListarPorId(id);
+		public async Task<IActionResult> ApagarConfirmacao(long id)
+		{
+			ProdutoModel produto = await _produtoRepositorio.ListarPorId(id);
 
-            return await Task.FromResult(View(produto));
-        }
+			return await Task.FromResult(View(produto));
+		}
 
-        public async Task<IActionResult> ApagarConfirmacao(long id)
-        {
-            ProdutoModel produto = await _produtoRepositorio.ListarPorId(id);
+		public async Task<IActionResult> Apagar(long id)
+		{
+			await _produtoRepositorio.Apagar(id);
 
-            return await Task.FromResult(View(produto));
-        }
+			return await Task.FromResult(RedirectToAction("Index"));
+		}
 
-        public async Task<IActionResult> Apagar(long id)
-        {
-            await _produtoRepositorio.Apagar(id);
+		[HttpPost]
+		public async Task<IActionResult> Criar(ProdutoModel produto,
+			IFormFile? imagemCarregada)
+		{
+			ProdutoModel model = produto;
 
-            return await Task.FromResult(RedirectToAction("Index"));
-        }
+			List<ValidationResult> results = new List<ValidationResult>();
+			ValidationContext context = new ValidationContext(model, null, null);
 
-        [HttpPost]
-        public async Task<IActionResult> Criar(ProdutoModel produto,
-            IFormFile? imagemCarregada)
-        {
-            ProdutoModel model = produto;
+			bool isValid = Validator.TryValidateObject(model, context, results, true);
 
-            List<ValidationResult> results = new List<ValidationResult>();
-            ValidationContext context = new ValidationContext(model, null, null);
+			if (!isValid)
+			{
+				foreach (var validationResult in results)
+				{
+					return View(model);
+				}
+			}
 
-            bool isValid = Validator.TryValidateObject(model, context, results, true);
+			model.DataDeRegistro = DateTime.Now;
+			model.Ativo = true;
 
-            if (!isValid)
-            {
-                foreach (var validationResult in results)
-                {
-                    return View(model);
-                }
-            }
+			// Carregamento de imagem
+			string wwwPath = this.Environment.WebRootPath;
+			string path = Path.Combine(wwwPath, "Uploads");
+			if (!Directory.Exists(path))
+			{
+				Directory.CreateDirectory(path);
+			}
+			string fileName = Path.GetFileName(imagemCarregada!.FileName);
 
-            model.DataDeRegistro = DateTime.Now;
-            model.Ativo = true;
+			var caminhoCompleto = Path.Combine(path, fileName);
 
-            // Carregamento de imagem
-            string wwwPath = this.Environment.WebRootPath;
-            string path = Path.Combine(wwwPath, "Uploads");
-            if (!Directory.Exists(path))
-            {
-                Directory.CreateDirectory(path);
-            }
-            string fileName = Path.GetFileName(imagemCarregada!.FileName);
+			using (FileStream stream = new FileStream(caminhoCompleto, FileMode.Create))
+			{
+				imagemCarregada.CopyTo(stream);
+				model.NomeDaFoto = caminhoCompleto;
+			}
 
-            var caminhoCompleto = Path.Combine(path, fileName);
+			model.Foto = Util.ReadFully2(caminhoCompleto);
 
-            using (FileStream stream = new FileStream(caminhoCompleto, FileMode.Create))
-            {
-                imagemCarregada.CopyTo(stream);
-                model.NomeDaFoto = caminhoCompleto;
-            }
+			await _produtoRepositorio.Adicionar(model);
 
-            model.Foto = Util.ReadFully2(caminhoCompleto);
+			return await Task.FromResult(RedirectToAction("Index"));
+		}
 
-            await _produtoRepositorio.Adicionar(model);
-
-            return await Task.FromResult(RedirectToAction("Index"));
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> Alterar(ProdutoModel produto)
-        {
-            await _produtoRepositorio.Atualizar(produto);
-            return await Task.FromResult(RedirectToAction("Index"));
-        }
-    }
+		[HttpPost]
+		public async Task<IActionResult> Alterar(ProdutoModel produto)
+		{
+			await _produtoRepositorio.Atualizar(produto);
+			return await Task.FromResult(RedirectToAction("Index"));
+		}
+	}
 }
